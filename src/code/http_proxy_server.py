@@ -28,7 +28,7 @@ class ConnectionHandler:
             print('%s method go'%self.method)
         self.client.close()
         self.target.close()
-    #???
+    # 获取请求头
     def get_base_header(self):
         while 1:
             self.client_buffer += self.client.recv(BUFLEN)
