@@ -22,13 +22,13 @@ class ConnectionHandler:
         # print('%s'%self.protocol)
         if self.method=='CONNECT':
             self.method_CONNECT()
-            print('%s method go'%self.method)
+            # print('%s method go'%self.method)
         elif self.method in ('OPTIONS', 'GET', 'HEAD', 'POST', 'PUT','DELETE', 'TRACE'):
             self.method_others()
-            print('%s method go'%self.method)
+            # print('%s method go'%self.method)
         self.client.close()
         self.target.close()
-    # 获取请求头
+    # 获取客户端请求
     def get_base_header(self):
         while 1:
             self.client_buffer += self.client.recv(BUFLEN)
@@ -37,13 +37,21 @@ class ConnectionHandler:
             end = str(self.client_buffer).find('\\r\\n')
             if end!=-1:
                 break
-        # print ('%s'%self.client_buffer)#debug
+        if str(self.client_buffer).find(r"http://m.analytics.126.net/news/c") != -1 :
+            # print (str(len(str(self.client_buffer).split(r'\r\n\r\n'))) + '%s'%self.client_buffer)#debug
+            # print(gzdecode(self.client_buffer)) #debug!!!-------------------------------------------------------------------------------------------------------
+            pass
         data = str(self.client_buffer[:end+1],encoding='utf-8').split()
-        self.client_buffer = self.client_buffer[end+1:]
-        print(listRepack(data)) ## 返回请求头的数据
+        # self.client_buffer = self.client_buffer[end+1:]
+        # print(listRepack(data)) ## 返回请求头的数据
+
+
+
+
         return listRepack(data)
+
     def method_CONNECT(self):
-        print('CONNECT......' + self.path)
+        # print('CONNECT......' + self.path)
         # try:
         # path_encode = self.path.encode()
         self._connect_target(self.path)
@@ -57,7 +65,7 @@ class ConnectionHandler:
 
     def method_others(self):
         self.path = self.path[7:]
-        print('method_others : %s' %self.path  )
+        # print('method_others : %s' %self.path  )
         i = unicode(self.path).find('/')
         host = self.path[:i]
         path = self.path[i:]
@@ -65,14 +73,14 @@ class ConnectionHandler:
         self.target.send(('%s %s %s\r\n'%(self.method, path, self.protocol)).encode() + self.client_buffer)
         self.client_buffer = ''
         self._read_write()
-        print('method_others is ok')
+        # print('method_others is ok')
     def _connect_target(self, host):
         i = unicode(host).find(':')
         if i!=-1:
             port = int(host[i+1:])
             host = host[:i]
-            print('port is ---  %s'%port)
-            print('host is ---  %s'%host)
+            # print('port is ---  %s'%port)
+            # print('host is ---  %s'%host)
         else:
             port = 80
         (soc_family, _, _, _, address) = socket.getaddrinfo(host, port)[0]
@@ -80,33 +88,36 @@ class ConnectionHandler:
         self.target.connect(address)
 
     def _read_write(self):
-        print('_read_write is run')
-        time_out_max = self.timeout/3
-        socs = [self.client, self.target]
-        count = 0
-        while 1:
-            count += 1
-            (recv, _, error) = select.select(socs, [], socs, 3)
-            if error:
-                break
-            if recv:
-                for in_ in recv:
-                    data = in_.recv(BUFLEN)
-                    if in_ is self.client:
-                        out = self.target
-                    else:
-                        out = self.client
-                    if data:
-                        out.send(data)
-                        count = 0
-            if count == time_out_max:
-                break
+        try:
+            # print('_read_write is run')
+            time_out_max = self.timeout/3
+            socs = [self.client, self.target]
+            count = 0
+            while 1:
+                count += 1
+                (recv, _, error) = select.select(socs, [], socs, 3)
+                if error:
+                    break
+                if recv:
+                    for in_ in recv:
+                        data = in_.recv(BUFLEN)
+                        if in_ is self.client:
+                            out = self.target
+                        else:
+                            out = self.client
+                        if data:
+                            out.send(data)
+                            count = 0
+                if count == time_out_max:
+                    break
+        except Exception as e:
+            pass
 
 #解压gzip
 # def gzdecode(content):
 #     return gzip.decompress(content).decode('utf8')
 def gzdecode(content) :
-    compressedstream = StringIO.StringIO(content)
+    compressedstream = StringIO(content)
     gziper = gzip.GzipFile(fileobj=compressedstream)
     data2 = gziper.read()
     return data2
