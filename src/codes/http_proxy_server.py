@@ -113,16 +113,16 @@ def onUpdate(self):
     self.now.set(self.current_iso8601())
     self.after(100, self.onUpdate)
 
-def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
-    if IPv6==True:
-        soc_type=socket.AF_INET6
-    else:
-        soc_type=socket.AF_INET
-    soc = socket.socket(soc_type)
-    soc.bind((host, port))
-    print( "Serving on %s:%d."%(host, port))#debug
-    soc.listen(1)
-    while 1:
-        _thread.start_new_thread(handler, soc.accept()+(timeout,))
-        _thread.TIMEOUT_MAX
-        time.sleep(0.3)
+# def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
+#     if IPv6==True:
+#         soc_type=socket.AF_INET6
+#     else:
+#         soc_type=socket.AF_INET
+#     soc = socket.socket(soc_type)
+#     soc.bind((host, port))
+#     print( "Serving on %s:%d."%(host, port))#debug
+#     soc.listen(1)
+#     while 1:
+#         _thread.start_new_thread(handler, soc.accept()+(timeout,))
+#         _thread.TIMEOUT_MAX
+#         time.sleep(0.3)
