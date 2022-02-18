@@ -80,9 +80,15 @@ class MY_GUI():
             self.log_data_Text.insert(END, logmsg_in)
 
 if __name__ == '__main__':
-    init_window = Tk()
-    init_window.write_log_to_Text('INFO:aes_trans_to_str success')
-    # proxy_server = start_server(select.select())
+    # init_window = Tk()
     # ZMJ_PORTAL = MY_GUI(init_window)
     # ZMJ_PORTAL.set_init_window()
-    init_window.mainloop()
+    # init_window.mainloop()
+
+
+    root = Tk()
+    #creating a label widget
+    myLabel = Label(root, text=start_server().prmpt)
+    #displaying it on the screen
+    myLabel.pack()
+    root.mainloop()

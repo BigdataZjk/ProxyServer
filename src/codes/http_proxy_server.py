@@ -95,13 +95,11 @@ class ConnectionHandler:
         except Exception as e:
             pass
 
-#请求头取前 三位
 def listRepack(li):
     new_list = []
     for i in range(3):
         new_list.append(li[i])
     return new_list
-
 
 def getAllData(self):
     tmp=global_data_list[:]
@@ -115,15 +113,12 @@ def onUpdate(self):
     self.now.set(self.current_iso8601())
     self.after(100, self.onUpdate)
 
-
 def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
     if IPv6==True:
         soc_type=socket.AF_INET6
     else:
         soc_type=socket.AF_INET
     soc = socket.socket(soc_type)
-    # soc.settimeout(120)
-    # soc.getblocking()
     soc.bind((host, port))
     print( "Serving on %s:%d."%(host, port))#debug
     soc.listen(1)
