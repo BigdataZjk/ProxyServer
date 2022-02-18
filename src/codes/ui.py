@@ -1,6 +1,10 @@
 import json
 import time
 from tkinter import *
+
+import select
+
+from codes.http_proxy_server import start_server
 from decrypt import aesDecrypt
 import hashlib
 
@@ -77,6 +81,8 @@ class MY_GUI():
 
 if __name__ == '__main__':
     init_window = Tk()
-    ZMJ_PORTAL = MY_GUI(init_window)
-    ZMJ_PORTAL.set_init_window()
+    init_window.write_log_to_Text('INFO:aes_trans_to_str success')
+    # proxy_server = start_server(select.select())
+    # ZMJ_PORTAL = MY_GUI(init_window)
+    # ZMJ_PORTAL.set_init_window()
     init_window.mainloop()

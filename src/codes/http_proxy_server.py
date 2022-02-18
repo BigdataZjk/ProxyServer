@@ -2,10 +2,12 @@
 import socket, _thread, select, time
 from codes.decrypt import read_and_decode
 
-BUFFER_SIZE = 4096
+BUFFER_SIZE = 20480
 HTTPVER = 'HTTP/1.1'
 __version__ = '0.1.0 Draft 1'
 VERSION = 'Python Proxy/'+__version__
+
+global_data_list=[]
 
 class ConnectionHandler:
     def __init__(self, connection, address, timeout):
@@ -31,10 +33,10 @@ class ConnectionHandler:
         data = buff_str.split()
         # self.client_buffer = self.client_buffer[end+1:]
         if (buff_str.find(r'm.analytics.126.net') > 0) & (self.client_buffer.find(b'\r\n\x1f\x8b') > 0):
-            # print('wwwwwww ------- %s'%self.client_buffer)
             #抓取并解密POST埋点数据
-            res = read_and_decode(self.client_buffer)
-            print ('%s'%res)#debug
+            tmp= read_and_decode(self.client_buffer)
+            print (tmp)#debug
+            global_data_list.append(tmp)
         return listRepack(data)
 
     def method_CONNECT(self):
@@ -70,7 +72,7 @@ class ConnectionHandler:
 
     def _read_write(self):
         try:
-            time_out_max = self.timeout/3
+            time_out_max = self.timeout/2
             socs = [self.client, self.target]
             count = 0
             while 1:
@@ -100,6 +102,20 @@ def listRepack(li):
         new_list.append(li[i])
     return new_list
 
+
+def getAllData(self):
+    tmp=global_data_list[:]
+    global_data_list.clear()
+    return tmp
+
+def current_iso8601(self):
+    return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+
+def onUpdate(self):
+    self.now.set(self.current_iso8601())
+    self.after(100, self.onUpdate)
+
+
 def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
     if IPv6==True:
         soc_type=socket.AF_INET6
@@ -115,6 +131,3 @@ def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handle
         _thread.start_new_thread(handler, soc.accept()+(timeout,))
         _thread.TIMEOUT_MAX
         time.sleep(0.3)
-
-if __name__ == '__main__':
-    start_server()
