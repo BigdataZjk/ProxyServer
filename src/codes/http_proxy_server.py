@@ -1,6 +1,6 @@
 #coding:utf-8
-import socket, _thread, select ,gzip
-from io import StringIO
+import socket, _thread, select, time
+from codes.decrypt import read_and_decode
 
 BUFFER_SIZE = 4096
 HTTPVER = 'HTTP/1.1'
@@ -10,56 +10,52 @@ VERSION = 'Python Proxy/'+__version__
 class ConnectionHandler:
     def __init__(self, connection, address, timeout):
         self.client = connection
-        self.client_buffer = ''.encode()
+        self.client_buffer = b''
         self.timeout = timeout
         self.method, self.path, self.protocol = self.get_base_header()
         if self.method=='CONNECT':
             self.method_CONNECT()
         elif self.method in ('OPTIONS', 'GET', 'HEAD', 'POST', 'PUT','DELETE', 'TRACE'):
             self.method_others()
+        # if self.client_buffer.find(b'\r\n\r\n') != -1:
         self.client.close()
         self.target.close()
     # 获取客户端请求
     def get_base_header(self):
         while 1:
             self.client_buffer += self.client.recv(BUFFER_SIZE)
-            end = self.client_buffer.find(b'\r\n\r\n')
+            end = self.client_buffer.find(b'\r\n')
             if end!=-1:
                 break
-        # self.client_buffer = self.client_buffer[end+1:]
         buff_str = str(self.client_buffer[:end+1],encoding='unicode_escape')
         data = buff_str.split()
+        # self.client_buffer = self.client_buffer[end+1:]
         if (buff_str.find(r'm.analytics.126.net') > 0) & (self.client_buffer.find(b'\r\n\x1f\x8b') > 0):
-            print('wwwwwww ------- %s'%self.client_buffer)
+            # print('wwwwwww ------- %s'%self.client_buffer)
             #抓取并解密POST埋点数据
             res = read_and_decode(self.client_buffer)
-            print ('debug ------- %s'%res)#debug
+            print ('%s'%res)#debug
         return listRepack(data)
 
     def method_CONNECT(self):
-        # print('CONNECT......' + self.path)
         # try:
-        # path_encode = self.path.encode()
         self._connect_target(self.path)
         self.client.send((HTTPVER+' 200 Connection established\n'+
                           'Proxy-agent: %s\n\n'%VERSION).encode())
-        self.client_buffer = ''
+        self.client_buffer = b''
         self._read_write()
         # except Exception as e:
-        #     print('CONNECT-------ERR----------------------')
         #     print(e)
 
     def method_others(self):
         self.path = self.path[7:]
-        # print('method_others : %s' %self.path  )
         i = str(self.path).find(r'/')
         host = self.path[:i]
         path = self.path[i:]
         self._connect_target(host)
         self.target.send(('%s %s %s\r\n'%(self.method, path, self.protocol)).encode() + self.client_buffer)
-        self.client_buffer = ''
+        self.client_buffer = b''
         self._read_write()
-        # print('method_others is ok')
 
     def _connect_target(self, host):
         i = str(host).find(r':')
@@ -97,34 +93,6 @@ class ConnectionHandler:
         except Exception as e:
             pass
 
-#解压gzip
-def gzdecode1(content1):
-    return gzip.decompress(content1).decode("utf-8")
-def gzdecode2(content2) :
-    compressedstream = StringIO(content2)
-    gziper = gzip.GzipFile(fileobj=compressedstream)
-    data2 = gziper.read()
-    return data2
-
-#读取上报并解密
-def read_and_decode(content3):
-    android_ind = content3.find(b'\r\n\x1f\x8b')
-    ios_ind = content3.find(b'\r\n\r\n\x1f\x8b')
-    print(ios_ind)
-    # Android
-    if content3.find(b'Android') < 500 & android_ind < 300:
-        i = content3[content3.find(b'\r\n\r\n')+4:]
-        de_res = gzip.decompress(i).decode("utf-8")
-        return de_res
-    # IOS
-    elif content3.find(b'iOS') < 500 &  ios_ind< 500:
-        i = content3[content3.find(b'\r\n\r\n')+4:]
-        de_res = gzip.decompress(i).decode("utf-8")
-        return de_res
-    else:
-        pass
-    return content3
-
 #请求头取前 三位
 def listRepack(li):
     new_list = []
@@ -132,18 +100,21 @@ def listRepack(li):
         new_list.append(li[i])
     return new_list
 
-def start_server(host='10.234.121.148', port=8888, IPv6=False, timeout=60,
-                 handler=ConnectionHandler):
+def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
     if IPv6==True:
         soc_type=socket.AF_INET6
     else:
         soc_type=socket.AF_INET
     soc = socket.socket(soc_type)
+    # soc.settimeout(120)
+    # soc.getblocking()
     soc.bind((host, port))
     print( "Serving on %s:%d."%(host, port))#debug
     soc.listen(1)
     while 1:
         _thread.start_new_thread(handler, soc.accept()+(timeout,))
+        _thread.TIMEOUT_MAX
+        time.sleep(0.3)
 
 if __name__ == '__main__':
     start_server()
