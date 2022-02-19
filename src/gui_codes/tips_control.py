@@ -1,5 +1,4 @@
-from tkinter import *
-
+from tkinter import Toplevel, LEFT, SOLID, BOTTOM, Label
 #鼠标悬停 提示控件
 class ToolTip(object):
 

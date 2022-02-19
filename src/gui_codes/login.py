@@ -2,8 +2,9 @@
 import tkinter as tk
 import tkinter.messagebox
 from tkinter import font
-import tips_control
-import gui_codes.tool
+from gui_codes import tips_control
+from gui_codes.proxy_frame import use_window_init
+
 def sign_in_window():
     #==============================================登陆界面==============================================================
     login_window = tk.Tk()
@@ -31,7 +32,7 @@ def sign_in_window():
     passwd_entry.pack()
     passwd_entry.place(x=100,y=80)
     #鼠标悬停 显示密码的label件，绑定事件
-    show_passwd_label = tk.Label(login_window,text='鼠标给我显示密码',font=('华文行楷',10,'italic',font.BOLD))
+    show_passwd_label = tk.Label(login_window,text='显示密码',font=('华文行楷',10,'italic',font.BOLD))
     toolTip = tips_control.ToolTip(show_passwd_label)
     def enter(event):
         toolTip.showtip(passwd_entry.get())
@@ -41,11 +42,11 @@ def sign_in_window():
     show_passwd_label.bind('<Leave>', leave)
     # create_ToolTip(show_passwd_label, passwd_entry.get())
     show_passwd_label.pack()
-    show_passwd_label.place(x=220,y=150)
+    show_passwd_label.place(x=260,y=150)
     #登陆 按钮
     btn = tk.Button(login_window,text='登陆',fg='black',width=8,compound='center', bg = 'white',cursor='hand2',command = lambda :jurge(login_window))
     btn.pack()
-    btn.place(x=140,y=120)
+    btn.place(x=140,y=130)
 
     def jurge(login_window):
         if entry.get() != 'zjk' or  passwd_entry.get() !='zjk':
@@ -54,10 +55,9 @@ def sign_in_window():
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
             login_window.destroy()
+            use_window_init()
     login_window.mainloop()
 
 if __name__ == '__main__':
-    # try:
-        sign_in_window()
-
-        gui_codes.use_window
+    # 登陆
+    sign_in_window()
