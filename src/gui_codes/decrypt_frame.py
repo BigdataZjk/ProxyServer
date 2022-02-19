@@ -13,25 +13,14 @@ DECTYPT_PASSWD = 'neteasemobiledat'
 class decrypt_frame(object):
     def __init__(self,init_tk_object):
         self.init_tk_object = init_tk_object
-        self.init_tk_object.protocol("WM_DELETE_WINDOW", self.on_closing)
-    #退出销毁父级
-    def on_closing(self):
-        if messagebox.askokcancel("Quit","Do you want to quit?"):
-            self.init_tk_object.destroy()
-    #返回代理frame 按钮事件
-    def show_root_window(self):
-        self.init_tk_object.update()
-        self.init_tk_object.deiconify()
-    def close_other_frame(self, frame):
-        frame.destroy()
-        self.show_root_window()
-    #设置窗口
-    def set_init_window(self):
         self.init_tk_object.resizable(0,0)
+        screen_width_x = str(int(self.init_tk_object.winfo_screenwidth()/2) - 500)
+        screen_height_y = str(int(self.init_tk_object.winfo_screenheight()/2) - 300)
+        screen_inti_str = r'1024x670' + r'+' + screen_width_x + r'+' + screen_height_y
+        self.init_tk_object.geometry(screen_inti_str)
         self.init_tk_object.title('银河埋点抓拆包工具')
-        self.init_tk_object.geometry('1068x681+400+50')
-        self.init_tk_object['bg'] = 'DEEPSKYBLUE'
-        self.init_tk_object.attributes('-alpha',0.618)   #虚化
+        # self.init_tk_object['bg'] = 'DEEPSKYBLUE'
+        # self.init_tk_object.attributes('-alpha',0.618)   #虚化
         #标签
         self.init_data_label = Label(self.init_tk_object, text='待解密数据')
         self.init_data_label.grid(row=0, column=0)
@@ -49,6 +38,14 @@ class decrypt_frame(object):
         #按钮
         self.aes_trans_to_str_button = Button(self.init_tk_object, text='解密', bg='lightblue', width=10,command=self.aes_trans_to_str)  # 调用内部方法  加()为直接调用
         self.aes_trans_to_str_button.grid(row=1, column=11)
+    #返回代理frame 按钮事件
+    def show_root_window(self):
+        self.init_tk_object.update()
+        self.init_tk_object.deiconify()
+    def close_other_frame(self, frame):
+        # self.init_tk_object.destroy
+        # frame.destroy()
+        self.show_root_window()
     #功能函数
     def aes_trans_to_str(self):
         aes_string = str(self.init_data_Text.get(1.0,END)).replace(' ','').encode('utf8')
@@ -79,7 +76,7 @@ class decrypt_frame(object):
     def write_log_to_Text(self,logmsg):
         global LOG_LINE_NUM
         current_time = self.get_current_time()
-        logmsg_in = str(current_time) +' ' + str(logmsg) + '\n'      #换行
+        logmsg_in = str(current_time) +' ' + str(logmsg) + '\n'
         if LOG_LINE_NUM <= 7:
             self.log_data_Text.insert(END, logmsg_in)
             LOG_LINE_NUM = LOG_LINE_NUM + 1
@@ -89,5 +86,4 @@ class decrypt_frame(object):
 
 # init_window = tkinter.Tk()
 # decrypt_frame_ = decrypt_frame(init_window)
-# decrypt_frame_.set_init_window()
 # init_window.mainloop()
