@@ -1,52 +1,11 @@
-from tkinter import *
 import tkinter as tk
+from tkinter import messagebox
 
-class MyApp(object):
-    """"""
+root = tk.Tk()
 
-    # ----------------------------------------------------------------------
-    def __init__(self, parent):
-        """Constructor"""
-        self.root = parent
-        self.root.title("Main frame")
-        self.frame = tk.Frame(parent)
-        self.frame.pack()
+def on_closing():
+    if messagebox.askokcancel("Quit","Do you want to quit?"):
+        root.destroy()
 
-        btn = tk.Button(self.frame, text="Open Frame", command=self.openFrame)
-        btn.pack()
-
-    # ----------------------------------------------------------------------
-    def hide(self):
-        """"""
-        self.root.withdraw()
-
-    # ----------------------------------------------------------------------
-    def openFrame(self):
-        """"""
-        self.hide()
-        otherFrame = tk.Toplevel()
-        otherFrame.geometry("400x300")
-        otherFrame.title("otherFrame")
-        handler = lambda: self.onCloseOtherFrame(otherFrame)
-        btn = tk.Button(otherFrame, text="Close", command=handler)
-        btn.pack()
-
-    # ----------------------------------------------------------------------
-    def onCloseOtherFrame(self, otherFrame):
-        """"""
-        otherFrame.destroy()
-        self.show()
-
-    # ----------------------------------------------------------------------
-    def show(self):
-        """"""
-        self.root.update()
-        self.root.deiconify()
-
-
-# ----------------------------------------------------------------------
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.geometry("800x600")
-    app = MyApp(root)
-    root.mainloop()
+root.protocol("WM_DELETE_WINDOW", on_closing)
+root.mainloop()

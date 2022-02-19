@@ -1,20 +1,19 @@
 #coding:utf-8
 import tkinter as tk
-from tkinter import ttk
-
 from gui_codes.decrypt_frame import decrypt_frame
 
-class Tool_Start(object):
+class proxy_frame(object):
 
-    def __init__(self, parent):
-        self.root = parent
+    def __init__(self):
+        self.root = tk.Tk()
         self.root.resizable(0,0)
         self.root.title("Main frame")
         self.root.geometry("800x600")
-        self.frame = tk.Frame(parent)
+        self.frame = tk.Frame(self.root)
         self.frame.pack()
         btn = tk.Button(self.frame, text="Open Frame", command=self.open_other_frame)
         btn.pack()
+        self.root.mainloop()
     def hide_root_window(self):
         self.root.withdraw()
     def show_root_window(self):
@@ -32,11 +31,4 @@ class Tool_Start(object):
         btn.grid(row=0, column=20)
         init_window.mainloop()
 def use_window_init():
-    root = tk.Tk()
-    init_ui = Tool_Start(root)
-    root.mainloop()
-
-
-
-
-# use_window_init()
+    proxy_frame()

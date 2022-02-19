@@ -2,8 +2,13 @@
 import tkinter as tk
 import tkinter.messagebox
 from tkinter import font
+from codes.http_proxy_server import ConnectionHandler
 from gui_codes import tips_control
+import _thread
+import socket
+import time
 from gui_codes.proxy_frame import use_window_init
+
 
 def sign_in_window():
     #==============================================登陆界面==============================================================
@@ -15,10 +20,10 @@ def sign_in_window():
     screen_inti_str = r'340x180' + r'+' + screen_width_x + r'+' + screen_height_y
     login_window.geometry(screen_inti_str)
 
-    lab_1 = tk.Label(login_window,width=7,text='用户名 :',compound='center')
+    lab_1 = tk.Label(login_window,width=7,text='本地IPV4:',compound='center')
     lab_1.place(x=30,y=40)
 
-    lab_2 = tk.Label(login_window,width=7,text='密  码 :',compound='center')
+    lab_2 = tk.Label(login_window,width=7,text='使用密码:',compound='center')
     lab_2.place(x=32,y=80)
     global uesr_name,password
     user_name = tk.StringVar()
@@ -49,13 +54,29 @@ def sign_in_window():
     btn.place(x=140,y=130)
 
     def jurge(login_window):
-        if entry.get() != 'zjk' or  passwd_entry.get() !='zjk':
-            tk.messagebox.showerror('*_*','密码错误,请重新输入')
-        else:
+        if entry.get().startswith(r'192') and  passwd_entry.get() =='zjk':
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
             login_window.destroy()
             use_window_init()
+        elif passwd_entry.get() !='zjk':
+            tk.messagebox.showerror('*_*','密码错误,请重新输入')
+        elif not entry.get().startswith(r'192'):
+            tk.messagebox.showerror('*_*','IP错误,请重新输入')
+
+    def start_server(host=entry.get(), port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
+        if IPv6==True:
+            soc_type=socket.AF_INET6
+        else:
+            soc_type=socket.AF_INET
+        soc = socket.socket(soc_type)
+        soc.bind((host, port))
+        print( "Serving on %s:%d."%(host, port))#debug
+        soc.listen(1)
+        while 1:
+            _thread.start_new_thread(handler, soc.accept()+(timeout,))
+            _thread.TIMEOUT_MAX
+            time.sleep(0.3)
     login_window.mainloop()
 
 if __name__ == '__main__':

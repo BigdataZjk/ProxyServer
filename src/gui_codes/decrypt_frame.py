@@ -1,6 +1,9 @@
+#coding:utf-8
 import json
-import time
+import tkinter
 from tkinter import *
+import time
+from tkinter import messagebox
 
 from codes.decrypt import aesDecrypt
 
@@ -10,6 +13,11 @@ DECTYPT_PASSWD = 'neteasemobiledat'
 class decrypt_frame(object):
     def __init__(self,init_tk_object):
         self.init_tk_object = init_tk_object
+        self.init_tk_object.protocol("WM_DELETE_WINDOW", self.on_closing)
+    #退出销毁父级
+    def on_closing(self):
+        if messagebox.askokcancel("Quit","Do you want to quit?"):
+            self.init_tk_object.destroy()
     #返回代理frame 按钮事件
     def show_root_window(self):
         self.init_tk_object.update()
@@ -41,11 +49,6 @@ class decrypt_frame(object):
         #按钮
         self.aes_trans_to_str_button = Button(self.init_tk_object, text='解密', bg='lightblue', width=10,command=self.aes_trans_to_str)  # 调用内部方法  加()为直接调用
         self.aes_trans_to_str_button.grid(row=1, column=11)
-        # #返回按钮
-        # handler = lambda: self.close_other_frame(self.init_tk_object)
-        # btn = Tk.Button(self.init_tk_object, text="返回代理", command=handler)
-        # btn.pack()
-        # btn.place(x=1,y=1)
     #功能函数
     def aes_trans_to_str(self):
         aes_string = str(self.init_data_Text.get(1.0,END)).replace(' ','').encode('utf8')
@@ -83,3 +86,8 @@ class decrypt_frame(object):
         else:
             self.log_data_Text.delete(1.0,2.0)
             self.log_data_Text.insert(END, logmsg_in)
+
+# init_window = tkinter.Tk()
+# decrypt_frame_ = decrypt_frame(init_window)
+# decrypt_frame_.set_init_window()
+# init_window.mainloop()

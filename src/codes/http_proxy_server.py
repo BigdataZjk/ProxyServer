@@ -94,17 +94,17 @@ class ConnectionHandler:
                     break
         except Exception as e:
             pass
-
+    def getAllData(self):
+        tmp=global_data_list[:]
+        global_data_list.clear()
+        return tmp
 def listRepack(li):
     new_list = []
     for i in range(3):
         new_list.append(li[i])
     return new_list
 
-def getAllData(self):
-    tmp=global_data_list[:]
-    global_data_list.clear()
-    return tmp
+
 
 def current_iso8601(self):
     return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
@@ -112,17 +112,3 @@ def current_iso8601(self):
 def onUpdate(self):
     self.now.set(self.current_iso8601())
     self.after(100, self.onUpdate)
-
-# def start_server(host='10.234.121.148', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
-#     if IPv6==True:
-#         soc_type=socket.AF_INET6
-#     else:
-#         soc_type=socket.AF_INET
-#     soc = socket.socket(soc_type)
-#     soc.bind((host, port))
-#     print( "Serving on %s:%d."%(host, port))#debug
-#     soc.listen(1)
-#     while 1:
-#         _thread.start_new_thread(handler, soc.accept()+(timeout,))
-#         _thread.TIMEOUT_MAX
-#         time.sleep(0.3)
