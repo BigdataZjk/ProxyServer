@@ -1,4 +1,5 @@
 #coding:utf-8
+import json
 import socket, _thread, select, time
 from codes.decrypt import read_and_decode
 
@@ -11,6 +12,7 @@ global_data_list=[]
 
 class ConnectionHandler:
     def __init__(self, connection, address, timeout):
+        self.msg_list = []
         self.client = connection
         self.client_buffer = b''
         self.timeout = timeout
@@ -34,10 +36,10 @@ class ConnectionHandler:
         # self.client_buffer = self.client_buffer[end+1:]
         if (buff_str.find(r'm.analytics.126.net') > 0) & (self.client_buffer.find(b'\r\n\x1f\x8b') > 0):
             #抓取并解密POST埋点数据
-            tmp= read_and_decode(self.client_buffer)
-            print (tmp)#debug
-            global_data_list.append(tmp)
-        return listRepack(data)
+            tmp = read_and_decode(self.client_buffer)
+            # 新消息 拆成单个 放入列表
+            self.reload_msg_list(tmp)
+        return self.listRepack(data)
 
     def method_CONNECT(self):
         # try:
@@ -98,17 +100,22 @@ class ConnectionHandler:
         tmp=global_data_list[:]
         global_data_list.clear()
         return tmp
-def listRepack(li):
-    new_list = []
-    for i in range(3):
-        new_list.append(li[i])
-    return new_list
+    def listRepack(self,li):
+        new_list = []
+        for i in range(3):
+            new_list.append(li[i])
+        return new_list
+
+    def reload_msg_list(self,new_josn_array):
+        if new_josn_array is None or new_josn_array == '':
+            return
+        json_arr = json.loads(new_josn_array)
+        for single_json in json_arr:
+            print('++++++++++++++++++',single_json)
+            self.msg_list.append(single_json)
 
 
-
-def current_iso8601(self):
-    return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-
-def onUpdate(self):
-    self.now.set(self.current_iso8601())
-    self.after(100, self.onUpdate)
+#
+# def current_iso8601(self):
+#     return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+#

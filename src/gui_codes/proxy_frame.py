@@ -97,7 +97,7 @@ def tid_drop_thread(tid, exctype):
 
 
 #开启/重启 事件
-def start_server(host='', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
+def start_server(host='192.168.1.3', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
 
     # tid_drop_thread(xxxx.ident, SystemExit)
     if IPv6==True:
@@ -116,4 +116,4 @@ def start_server(host='', port=8889, IPv6=False, timeout=60,handler=ConnectionHa
 if __name__ == '__main__':
 
 
-    proxy_frame()
+    start_server()
