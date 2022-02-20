@@ -55,7 +55,7 @@ class decrypt_frame(object):
                 if '{' not in decrypt_res:
                     print()
                 else:
-                    middle_json = json.loads(aesDecrypt(DECTYPT_PASSWD, aes_string))
+                    middle_json = json.loads(decrypt_res)
                     decrypt_res = json.dumps(middle_json, sort_keys=True, indent=2)
                 #输出到界面
                 self.result_data_Text.delete(1.0,END) #清空内容
