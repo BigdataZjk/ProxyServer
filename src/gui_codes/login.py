@@ -3,7 +3,6 @@ import tkinter as tk
 import tkinter.messagebox
 from tkinter import font
 from gui_codes import tips_control
-from gui_codes.proxy_frame import proxy_frame
 
 
 class sign_in_window():
@@ -60,9 +59,8 @@ class sign_in_window():
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
             self.root.destroy()
-            proxy_frame()
+            # proxy_frame()
         elif passwd !='zjk':
             tk.messagebox.showerror('*_*','密码错误,请重新输入')
         elif not ip.startswith(r'192'):
             tk.messagebox.showerror('*_*','IP错误,请重新输入')
-sign_in_window()
