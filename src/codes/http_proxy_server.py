@@ -1,5 +1,8 @@
 #coding:utf-8
 from threading import Timer, Thread
+from tkinter import messagebox
+
+import soc as soc
 
 from gui_codes.login import sign_in_window
 import socket, _thread, select, time
@@ -13,9 +16,9 @@ BUFFER_SIZE = 20480
 HTTPVER = 'HTTP/1.1'
 __version__ = '0.1.0 Draft 1'
 VERSION = 'Python Proxy/'+__version__
-global_data_list = [{"1":2}]
-
-
+global_data_list = []
+table_data_list = []
+LOGIN_IP = ''
 PROXY_LINE_NUM = 0
 #===============================================================================SOCKET代理模块===============================================================================
 class ConnectionHandler(object):
@@ -116,24 +119,36 @@ class ConnectionHandler(object):
             return
         json_arr = json.loads(new_josn_array)
         for single_json in json_arr:
-            # print('+++++  ',single_json)
-            if single_json['e']:
+            if 'e' in single_json:
+                dic_item = {}
                 e = single_json['e']
+                event_id_list = []
+                #把单json的 事件id 遍历放入 event_id_list
                 for i in range(len(e)):
-                    dic_item = {}
                     #获取event_id
                     event_id = e[i]['n']
-                    #获取event_time
-                    timestamp = float(int(e[i]['ts'])/1000)
-                    time_local = time.localtime(timestamp)
-                    event_time = time.strftime("%H:%M:%S",time_local)
-                    #key[event_id---event_time]
-                    dic_key = event_id + '---' + event_time
-                    #value[simple_msg]
-                    simple_msg = json.dumps({**e[i], **get_data(single_json)})
-                    dic_item[dic_key] = simple_msg
-                    global_data_list.append(dic_item)
-        # print(global_data_list)
+                    event_id_list.append(event_id)
+                dic_key = str(event_id_list) + '【%s】'%get_current_time()
+                dic_item[dic_key] = single_json
+                global_data_list.append(dic_item)
+                # print(dic_item)
+##================================================细拆==========================
+                # for i in range(len(e)):
+                #     dic_item = {}
+                #     #获取event_id
+                #     event_id = e[i]['n']
+                #     #获取event_time
+                #     timestamp = float(int(e[i]['ts'])/1000)
+                #     time_local = time.localtime(timestamp)
+                #     event_time = time.strftime("%H:%M:%S",time_local)
+                #     #key[event_id---event_time]
+                #     dic_key = event_id + '---' + event_time
+                #     #value[simple_msg]
+                #     simple_msg = json.dumps({**e[i], **get_data(single_json)})
+                #     dic_item[dic_key] = simple_msg
+                #     global_data_list.append(dic_item)
+                #     print(dic_item)
+        # print('global_data_list----%s'%global_data_list)
 def get_data(msg):
     tmp = dict(msg)
     del tmp['e']
@@ -152,28 +167,29 @@ class proxy_frame(object):
         #代理和解码 工具切换按钮
         self.change_btn = tk.Button(self.root, text='切换解密面板...',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=17, command=self.open_other_frame)
         self.change_btn.place(x=830, y=0)
-        #开启/重启 代理按钮
-        self.restart_btn = tk.Button(self.root, text='开启代理...',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=15 ,command= self.write_kv_to_table)
+        #刷新按钮
+        self.restart_btn = tk.Button(self.root, text='刷新',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=15 ,command= self.write_kv_to_table)
         self.restart_btn.place(x=535, y=0)
         #清屏按钮
         self.restart_btn = tk.Button(self.root, text='清屏',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=10 ,command= self.clean_table)
         self.restart_btn.place(x=40, y=0)
-        #左边的选择概述列表
+        #左边列表
         self.left_sb = Scrollbar(self.root)
+        self.bottom_sb = Scrollbar(self.root)
         self.lb = Listbox(self.root,yscrollcommand= self.left_sb.set)
-        for i in range(300):
-            self.lb.insert(END,i)
+        self.lb = Listbox(self.root,xscrollcommand= self.bottom_sb.set)
+        # for i in range(300):
+        #     self.lb.insert(END,i)
         self.lb.place(x=25,y=34,relwidth=0.9,relheight=0.9)
-        #左滚动条 绑定左list + 样式
+        #左\底部滚动条 绑定左list + 样式
         self.left_sb.pack(side=LEFT, fill=Y)
         self.left_sb.config(width=25, orient='vertical',command=self.lb.yview)
+        self.bottom_sb.pack(side=BOTTOM, fill=X)
+        self.bottom_sb.config(width=25, orient='vertical',command=self.lb.xview)
         #右边的文本
         self.mt = Text(self.root, width=10, height=48)
-        self.mt.place(x=145,y=35,relwidth=0.9,relheight=0.9)
-
+        self.mt.place(x=480,y=35,relwidth=0.9,relheight=0.9)
         self.root.mainloop()
-        self.time_task
-
     def on_closing(self):
         if messagebox.askokcancel("Quit","Do you want to quit?"):
             self.root.destroy()
@@ -197,13 +213,28 @@ class proxy_frame(object):
 
     #抓包数据 动态打印
     def write_kv_to_table(self):
+        insert_list = self.init_show()
+        print(insert_list)
         global global_data_list
-        # self.clean_table
-        for dic in global_data_list:
-            key_list = list(dic.keys())
-            for k in key_list:
-                self.lb.insert(1,k)
-    #抓包数据 动态打印
+        if len(insert_list)>0:
+            for dic in insert_list:
+                key_list = list(dic.keys())
+                for k in key_list:
+                    self.lb.insert(1,k)
+    #定时刷新
+    def timer_show(self):
+        t = RepeatingTimer(1,self.write_kv_to_table)
+        t.start()
+    #选择未展示的插入列表
+    def init_show(self):
+        data_insert = []
+        global global_data_list,table_data_list
+        for i in global_data_list:
+            if i not in table_data_list:
+                table_data_list.append(i)
+                data_insert.append(i)
+        return data_insert
+    #清空面板
     def clean_table(self):
         global global_data_list
         global_data_list = []
@@ -213,9 +244,7 @@ class proxy_frame(object):
             self.lb.delete(0,END)
         else:
             self.mt.insert(1.0,'======无需清空======')
-    #定时刷新
-    def time_task(self):
-        Timer(1, self.write_kv_to_table, ()).start()
+
 
 # #结束线程
 # def tid_drop_thread(tid, exctype):
@@ -228,10 +257,13 @@ class proxy_frame(object):
 #         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
 #         raise SystemError("PyThreadState_SetAsyncExc failed")
 
-
+class RepeatingTimer(Timer):
+    def run(self):
+        while not self.finished.is_set():
+            self.function(*self.args, **self.kwargs)
+            self.finished.wait(self.interval)
 #开启/重启 事件
-def start_server(host='192.168.1.3', port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
-
+def start_server(host,port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
     # tid_drop_thread(xxxx.ident, SystemExit)
     if IPv6==True:
         soc_type=socket.AF_INET6
@@ -239,26 +271,21 @@ def start_server(host='192.168.1.3', port=8889, IPv6=False, timeout=60,handler=C
         soc_type=socket.AF_INET
     soc = socket.socket(soc_type)
     soc.bind((host, port))
-    print( "Serving on %s:%d."%(host, port))
+    print( "Serving on %s:%d..."%(host, port))
     soc.listen(1)
     while 1:
-        # print(handler.get_global_msg_list(handler))
-        th = _thread.start_new_thread(handler, soc.accept()+(timeout,))
+        _thread.start_new_thread(handler, soc.accept()+(timeout,))
         _thread.TIMEOUT_MAX
         time.sleep(0.3)
-
-def st():
-    pf = proxy_frame()
-    pf.time_task
-    print(111)
+def get_current_time():
+    current_time = time.strftime('%H:%M:%S',time.localtime(time.time()))
+    return current_time
 if __name__ == '__main__':
-    t_list = []
-    t_list.append(Thread(target=start_server))
-    t_list.append(Thread(target=st))
-    # if sign_in_window():
-    for th in t_list:
-        th.start()
+    #登录 + 获取输入ip
+    # sw = sign_in_window()
+    # LOGIN_IP = sw.get_ip()
+    _thread.start_new_thread(proxy_frame, ())
+    Thread(target=start_server(host='10.234.121.148')).start()
 
 
-    # login = sign_in_window()
 

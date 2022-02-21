@@ -1,10 +1,7 @@
 #coding:utf-8
 import json
-import tkinter
 from tkinter import *
 import time
-from tkinter import messagebox
-
 from codes.decrypt import aesDecrypt
 
 LOG_LINE_NUM = 0

@@ -4,8 +4,8 @@ import tkinter.messagebox
 from tkinter import font
 from gui_codes import tips_control
 
-
-class sign_in_window():
+global_ip = ''
+class sign_in_window(object):
     def __init__(self):
         #==============================================登陆界面==============================================================
         self.root = tk.Tk()
@@ -53,14 +53,17 @@ class sign_in_window():
     def leave(self,event):
         self.toolTip.hidetip()
     def jurge(self):
+        global global_ip
         ip = self.entry1.get()
         passwd = self.entry2.get()
-        if ip.startswith(r'192') and passwd =='zjk':
+        if ip.startswith(r'10.') and passwd =='zjk':
+            global_ip = ip
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
             self.root.destroy()
-            # proxy_frame()
         elif passwd !='zjk':
             tk.messagebox.showerror('*_*','密码错误,请重新输入')
-        elif not ip.startswith(r'192'):
+        elif not ip.startswith(r'10.'):
             tk.messagebox.showerror('*_*','IP错误,请重新输入')
+    def get_ip(self):
+        return global_ip

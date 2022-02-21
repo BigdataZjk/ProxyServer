@@ -1,7 +1,7 @@
 import base64
 import gzip
-import json
-from Crypto.Cipher import AES
+
+from Cryptodome.Cipher import AES
 
 BLOCK_SIZE = 16  # Bytes
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(s) % BLOCK_SIZE)
@@ -61,12 +61,18 @@ def read_and_decode(content3):
             if content3.find(b'Android') != -1:
                 a = content3[term_ind:-7]
                 de_res = gzip.decompress(a).decode("utf-8")
-                return aesDecrypt(DECTYPT_PASSWD,de_res)
+                if '{' in de_res:
+                    return de_res
+                else:
+                    return aesDecrypt(DECTYPT_PASSWD,de_res)
             # IOS
             elif content3.find(b'iOS') != -1:
                 i = content3[content3.find(b'\x1f\x8b\x08\x00'):]
                 de_res = gzip.decompress(i).decode("utf-8")
-                return de_res
+                if '{' in de_res:
+                    return de_res
+                else:
+                    return aesDecrypt(DECTYPT_PASSWD,de_res)
             else:
                 pass
             return content3
