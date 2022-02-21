@@ -1,6 +1,6 @@
 #coding:utf-8
 from threading import Timer, Thread
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 import soc as soc
 
@@ -173,22 +173,38 @@ class proxy_frame(object):
         #清屏按钮
         self.restart_btn = tk.Button(self.root, text='清屏',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=10 ,command= self.clean_table)
         self.restart_btn.place(x=40, y=0)
-        #左边列表
-        self.left_sb = Scrollbar(self.root)
-        self.bottom_sb = Scrollbar(self.root)
-        self.lb = Listbox(self.root,yscrollcommand= self.left_sb.set)
-        self.lb = Listbox(self.root,xscrollcommand= self.bottom_sb.set)
-        # for i in range(300):
-        #     self.lb.insert(END,i)
-        self.lb.place(x=25,y=34,relwidth=0.9,relheight=0.9)
-        #左\底部滚动条 绑定左list + 样式
-        self.left_sb.pack(side=LEFT, fill=Y)
-        self.left_sb.config(width=25, orient='vertical',command=self.lb.yview)
-        self.bottom_sb.pack(side=BOTTOM, fill=X)
-        self.bottom_sb.config(width=25, orient='vertical',command=self.lb.xview)
+        # #左边列表
+        # self.left_sb = Scrollbar(self.root)
+        # self.bottom_sb = Scrollbar(self.root)
+        # self.lb = Listbox(self.root,yscrollcommand= self.left_sb.set)
+        # self.lb = Listbox(self.root,xscrollcommand= self.bottom_sb.set)
+        # self.lb.place(x=25,y=34,relwidth=0.9,relheight=0.9)
+        # #左\底部滚动条 绑定左list + 样式
+        # self.left_sb.pack(side=LEFT, fill=Y)
+        # self.left_sb.config(width=25, orient='vertical',command=self.lb.yview)
+        # 左边列表使用树目录
+        self.ybar = Scrollbar(self.root,orient='vertical')
+        self.xbar = Scrollbar(self.root,orient='vertical')
+
+        self.tv = ttk.Treeview(self.root, height=10, selectmode = 'browse')
+
+        self.tv.configure(yscrollcommand=self.ybar.set)
+        self.tv.configure(xscrollcommand=self.xbar.set)
+
+        self.ybar.config(width=25, orient='vertical',command=self.tv.yview)
+        self.xbar.config(width=15, orient='vertical',command=self.tv.xview)
+        # for i in range(1,500):
+        #     self.tv.insert('',0,text='dawncuihuiuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu')
+        self.tv.place(x=25,y=34,relwidth=0.9,relheight=0.9)
+        self.ybar.pack(side=LEFT, fill=Y)
+        self.xbar.pack(side=BOTTOM, fill=X)
+        self.tv.bind('<ButtonRelease-1>',lambda event:self.treeviewclick(event,self.tv))
+        self.tv.bind('<ButtonRelease-1>',lambda event:self.click_event(event,self.tv))
         #右边的文本
         self.mt = Text(self.root, width=10, height=48)
-        self.mt.place(x=480,y=35,relwidth=0.9,relheight=0.9)
+        # self.mt.place(x=500,y=35,relwidth=0.9,relheight=0.9)
+        self.mt.place(x=200,y=35,relwidth=0.9,relheight=0.9)
+        self.mt.configure(font=('Courier', 16, 'italic'))
         self.root.mainloop()
     def on_closing(self):
         if messagebox.askokcancel("Quit","Do you want to quit?"):
@@ -210,17 +226,17 @@ class proxy_frame(object):
         #退出销毁父级
         init_window.protocol("WM_DELETE_WINDOW", self.on_closing)
         init_window.mainloop()
-
     #抓包数据 动态打印
     def write_kv_to_table(self):
         insert_list = self.init_show()
-        print(insert_list)
         global global_data_list
         if len(insert_list)>0:
+            print(insert_list)
             for dic in insert_list:
                 key_list = list(dic.keys())
                 for k in key_list:
-                    self.lb.insert(1,k)
+                    # self.lb.insert(1,k)
+                    self.tv.insert('',0,text=k)
     #定时刷新
     def timer_show(self):
         t = RepeatingTimer(1,self.write_kv_to_table)
@@ -240,11 +256,30 @@ class proxy_frame(object):
         global_data_list = []
         if self.mt.get(1.0,END) != '':
             self.mt.delete(1.0,END)
-        if self.lb.get(0,END) != ():
-            self.lb.delete(0,END)
+        if self.tv.selection() != ():
+            for item in self.tv.get_children():
+                self.tv.delete(item)
+
         else:
             self.mt.insert(1.0,'======无需清空======')
-
+    #点击 复制
+    def treeviewclick(self,event,tree):
+        self.root.clipboard_clear()
+        for item in tree.selection():
+            item_text = tree.item(item,'text')
+        self.root.clipboard_append(item_text)
+    #点击 显示原始数据
+    def click_event(self,event,tree):
+        old_json = ''
+        global global_data_list
+        for item in tree.selection():
+            key = tree.item(item,'text')
+        for i in global_data_list:
+            if key in i:
+                old_json = json.dumps(i[key], sort_keys=True, indent=2).encode('utf-8')
+        if self.mt.get(1.0,END) != '':
+            self.mt.delete(1.0,END)
+        self.mt.insert(1.0,old_json)
 
 # #结束线程
 # def tid_drop_thread(tid, exctype):
@@ -280,12 +315,11 @@ def start_server(host,port=8889, IPv6=False, timeout=60,handler=ConnectionHandle
 def get_current_time():
     current_time = time.strftime('%H:%M:%S',time.localtime(time.time()))
     return current_time
+
 if __name__ == '__main__':
-    #登录 + 获取输入ip
-    # sw = sign_in_window()
-    # LOGIN_IP = sw.get_ip()
+    sw = sign_in_window()
+    ip = sw.get_ip_passwd()[0]
+    passwd = sw.get_ip_passwd()[1]
     _thread.start_new_thread(proxy_frame, ())
-    Thread(target=start_server(host='10.234.121.148')).start()
-
-
+    Thread(target=start_server(host=ip)).start()
 

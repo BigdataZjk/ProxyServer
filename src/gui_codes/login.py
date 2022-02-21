@@ -5,6 +5,7 @@ from tkinter import font
 from gui_codes import tips_control
 
 global_ip = ''
+global_passwd = ''
 class sign_in_window(object):
     def __init__(self):
         #==============================================登陆界面==============================================================
@@ -47,17 +48,17 @@ class sign_in_window(object):
         btn.place(x=140,y=130)
     
         self.root.mainloop()
-
     def enter(self,event):
         self.toolTip.showtip(self.entry2.get())
     def leave(self,event):
         self.toolTip.hidetip()
     def jurge(self):
-        global global_ip
+        global global_ip,global_passwd
         ip = self.entry1.get()
         passwd = self.entry2.get()
         if ip.startswith(r'10.') and passwd =='zjk':
             global_ip = ip
+            global_passwd = passwd
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
             self.root.destroy()
@@ -65,5 +66,5 @@ class sign_in_window(object):
             tk.messagebox.showerror('*_*','密码错误,请重新输入')
         elif not ip.startswith(r'10.'):
             tk.messagebox.showerror('*_*','IP错误,请重新输入')
-    def get_ip(self):
-        return global_ip
+    def get_ip_passwd(self):
+        return [global_ip,global_passwd]
