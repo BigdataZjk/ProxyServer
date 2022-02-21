@@ -53,7 +53,7 @@ class decrypt_frame(object):
                     print()
                 else:
                     middle_json = json.loads(decrypt_res)
-                    decrypt_res = json.dumps(middle_json, sort_keys=True, indent=2)
+                    decrypt_res = json.dumps(middle_json, sort_keys=True, indent=2,ensure_ascii=False)
                 #输出到界面
                 self.result_data_Text.delete(1.0,END) #清空内容
                 self.result_data_Text.insert(1.0,decrypt_res)

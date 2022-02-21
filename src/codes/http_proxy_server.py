@@ -200,7 +200,7 @@ class proxy_frame(object):
         self.mt = Text(self.root, width=10, height=48)
         # self.mt.place(x=500,y=35,relwidth=0.9,relheight=0.9)
         self.mt.place(x=200,y=35,relwidth=0.9,relheight=0.9)
-        self.mt.configure(font=('Courier', 16, 'italic'))
+        self.mt.configure(font=('Courier', 9))
         self.root.mainloop()
     def on_closing(self):
         if messagebox.askokcancel("Quit","Do you want to quit?"):
@@ -278,7 +278,7 @@ class proxy_frame(object):
                 old_json = i[key]
         if self.mt.get(1.0,END) != '':
             self.mt.delete(1.0,END)
-        self.mt.insert(1.0,old_json)
+        self.mt.insert(1.0,json.dumps(old_json, sort_keys=True, indent=2,ensure_ascii=False))
 
 # #结束线程
 # def tid_drop_thread(tid, exctype):
