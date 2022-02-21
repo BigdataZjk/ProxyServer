@@ -234,9 +234,7 @@ class proxy_frame(object):
                     # self.lb.insert(1,k)
                     self.tv.insert('',0,text=k)
     #定时刷新
-    def timer_show(self):
-        t = RepeatingTimer(1,self.write_kv_to_table)
-        t.start()
+        self.root.after(1000,self.write_kv_to_table)
     #选择未展示的插入列表
     def init_show(self):
         data_insert = []
@@ -291,11 +289,14 @@ class proxy_frame(object):
 #         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
 #         raise SystemError("PyThreadState_SetAsyncExc failed")
 
-class RepeatingTimer(Timer):
-    def run(self):
-        while not self.finished.is_set():
-            self.function(*self.args, **self.kwargs)
-            self.finished.wait(self.interval)
+# class RepeatingTimer(Timer):
+#     def run(self):
+#         while not self.finished.is_set():
+#             self.function(*self.args, **self.kwargs)
+#             self.finished.wait(self.interval)
+#     def timer_show(self):
+#         t = RepeatingTimer(1,self.write_kv_to_table)
+#         t.start()
 #开启/重启 事件
 def start_server(host,port=8889, IPv6=False, timeout=60,handler=ConnectionHandler):
     # tid_drop_thread(xxxx.ident, SystemExit)
