@@ -1,7 +1,7 @@
 import base64
 import gzip
 
-from Cryptodome.Cipher import AES
+from Crypto.Cipher import AES
 
 BLOCK_SIZE = 16  # Bytes
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(s) % BLOCK_SIZE)

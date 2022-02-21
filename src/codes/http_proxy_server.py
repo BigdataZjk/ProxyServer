@@ -1,10 +1,6 @@
 #coding:utf-8
 from threading import Timer, Thread
 from tkinter import messagebox, ttk
-
-import soc as soc
-
-from gui_codes.login import sign_in_window
 import socket, _thread, select, time
 from codes.decrypt import read_and_decode
 import _thread
@@ -183,22 +179,22 @@ class proxy_frame(object):
         # self.left_sb.pack(side=LEFT, fill=Y)
         # self.left_sb.config(width=25, orient='vertical',command=self.lb.yview)
         # 左边列表使用树目录
-        self.ybar = Scrollbar(self.root,orient='vertical')
+        # self.ybar = Scrollbar(self.root,orient='vertical')
         self.xbar = Scrollbar(self.root,orient='vertical')
 
         self.tv = ttk.Treeview(self.root, height=10, selectmode = 'browse')
 
-        self.tv.configure(yscrollcommand=self.ybar.set)
+        # self.tv.configure(yscrollcommand=self.ybar.set)
         self.tv.configure(xscrollcommand=self.xbar.set)
 
-        self.ybar.config(width=25, orient='vertical',command=self.tv.yview)
+        # self.ybar.config(width=25, orient='vertical',command=self.tv.yview)
         self.xbar.config(width=15, orient='vertical',command=self.tv.xview)
         # for i in range(1,500):
         #     self.tv.insert('',0,text='dawncuihuiuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu')
         self.tv.place(x=25,y=34,relwidth=0.9,relheight=0.9)
-        self.ybar.pack(side=LEFT, fill=Y)
+        # self.ybar.pack(side=LEFT, fill=Y)
         self.xbar.pack(side=BOTTOM, fill=X)
-        self.tv.bind('<ButtonRelease-1>',lambda event:self.treeviewclick(event,self.tv))
+        self.root.bind('<ButtonRelease-1>',lambda event:self.treeviewclick(event))
         self.tv.bind('<ButtonRelease-1>',lambda event:self.click_event(event,self.tv))
         #右边的文本
         self.mt = Text(self.root, width=10, height=48)
@@ -231,7 +227,7 @@ class proxy_frame(object):
         insert_list = self.init_show()
         global global_data_list
         if len(insert_list)>0:
-            print(insert_list)
+            # print(json.dumps(insert_list, sort_keys=True, indent=2))
             for dic in insert_list:
                 key_list = list(dic.keys())
                 for k in key_list:
@@ -263,20 +259,23 @@ class proxy_frame(object):
         else:
             self.mt.insert(1.0,'======无需清空======')
     #点击 复制
-    def treeviewclick(self,event,tree):
+    def treeviewclick(self,event):
+        item_text = ''
         self.root.clipboard_clear()
-        for item in tree.selection():
-            item_text = tree.item(item,'text')
+        ts = self.tv.selection()
+        for item in ts:
+            item_text = self.tv.item(item,'text')
         self.root.clipboard_append(item_text)
     #点击 显示原始数据
     def click_event(self,event,tree):
         old_json = ''
+        key = ''
         global global_data_list
         for item in tree.selection():
             key = tree.item(item,'text')
         for i in global_data_list:
             if key in i:
-                old_json = json.dumps(i[key], sort_keys=True, indent=2).encode('utf-8')
+                old_json = i[key]
         if self.mt.get(1.0,END) != '':
             self.mt.delete(1.0,END)
         self.mt.insert(1.0,old_json)
@@ -317,9 +316,9 @@ def get_current_time():
     return current_time
 
 if __name__ == '__main__':
-    sw = sign_in_window()
-    ip = sw.get_ip_passwd()[0]
-    passwd = sw.get_ip_passwd()[1]
+    # sw = sign_in_window()
+    # ip = sw.get_ip_passwd()[0]
+    # passwd = sw.get_ip_passwd()[1]
     _thread.start_new_thread(proxy_frame, ())
-    Thread(target=start_server(host=ip)).start()
+    Thread(target=start_server(host='192.168.1.3')).start()
 
