@@ -117,7 +117,7 @@ class ConnectionHandler(object):
         json_arr = json.loads(new_josn_array)
         for single_json in json_arr:
             # print('+++++  ',single_json)
-            if single_json['e'] is not None:
+            if single_json['e']:
                 e = single_json['e']
                 for i in range(len(e)):
                     dic_item = {}
@@ -170,8 +170,9 @@ class proxy_frame(object):
         #右边的文本
         self.mt = Text(self.root, width=10, height=48)
         self.mt.place(x=145,y=35,relwidth=0.9,relheight=0.9)
-        self.time_task
+
         self.root.mainloop()
+        self.time_task
 
     def on_closing(self):
         if messagebox.askokcancel("Quit","Do you want to quit?"):
@@ -201,8 +202,6 @@ class proxy_frame(object):
         for dic in global_data_list:
             key_list = list(dic.keys())
             for k in key_list:
-                print(k)
-                # print(k)
                 self.lb.insert(1,k)
     #抓包数据 动态打印
     def clean_table(self):
@@ -248,11 +247,14 @@ def start_server(host='192.168.1.3', port=8889, IPv6=False, timeout=60,handler=C
         _thread.TIMEOUT_MAX
         time.sleep(0.3)
 
-
+def st():
+    pf = proxy_frame()
+    pf.time_task
+    print(111)
 if __name__ == '__main__':
     t_list = []
     t_list.append(Thread(target=start_server))
-    t_list.append(Thread(target=proxy_frame))
+    t_list.append(Thread(target=st))
     # if sign_in_window():
     for th in t_list:
         th.start()
