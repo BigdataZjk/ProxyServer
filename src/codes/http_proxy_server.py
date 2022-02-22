@@ -1,7 +1,7 @@
 #coding:utf-8
 from threading import Timer, Thread
 from tkinter import messagebox, ttk
-import socket, _thread, select, time
+import select
 from codes.decrypt import read_and_decode
 import _thread
 import socket
@@ -113,7 +113,7 @@ class ConnectionHandler(object):
         global global_data_list
         if new_josn_array is None or new_josn_array == '':
             return
-        json_arr = json.loads(new_josn_array)
+        json_arr = json.loads(str(new_josn_array))
         for single_json in json_arr:
             if 'e' in single_json:
                 dic_item = {}
@@ -163,45 +163,36 @@ class proxy_frame(object):
         #代理和解码 工具切换按钮
         self.change_btn = tk.Button(self.root, text='切换解密面板...',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=17, command=self.open_other_frame)
         self.change_btn.place(x=830, y=0)
-        #刷新按钮
-        self.restart_btn = tk.Button(self.root, text='刷新',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=15 ,command= self.write_kv_to_table)
+        # #刷新按钮
+        self.restart_btn = tk.Button(self.root, text='开启自动刷新',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=15 ,command= self.write_kv_to_table)
         self.restart_btn.place(x=535, y=0)
         #清屏按钮
         self.restart_btn = tk.Button(self.root, text='清屏',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=10 ,command= self.clean_table)
         self.restart_btn.place(x=40, y=0)
-        # #左边列表
-        # self.left_sb = Scrollbar(self.root)
-        # self.bottom_sb = Scrollbar(self.root)
-        # self.lb = Listbox(self.root,yscrollcommand= self.left_sb.set)
-        # self.lb = Listbox(self.root,xscrollcommand= self.bottom_sb.set)
-        # self.lb.place(x=25,y=34,relwidth=0.9,relheight=0.9)
-        # #左\底部滚动条 绑定左list + 样式
-        # self.left_sb.pack(side=LEFT, fill=Y)
-        # self.left_sb.config(width=25, orient='vertical',command=self.lb.yview)
-        # 左边列表使用树目录
-        # self.ybar = Scrollbar(self.root,orient='vertical')
-        self.xbar = Scrollbar(self.root,orient='vertical')
-
-        self.tv = ttk.Treeview(self.root, height=10, selectmode = 'browse')
-
-        # self.tv.configure(yscrollcommand=self.ybar.set)
-        self.tv.configure(xscrollcommand=self.xbar.set)
-
-        # self.ybar.config(width=25, orient='vertical',command=self.tv.yview)
-        self.xbar.config(width=15, orient='vertical',command=self.tv.xview)
-        # for i in range(1,500):
-        #     self.tv.insert('',0,text='dawncuihuiuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu')
-        self.tv.place(x=25,y=34,relwidth=0.9,relheight=0.9)
-        # self.ybar.pack(side=LEFT, fill=Y)
+        #左边
+        self.xbar = Scrollbar(self.root,orient='horizontal',troughcolor='blue')
         self.xbar.pack(side=BOTTOM, fill=X)
+
+        self.ybar = Scrollbar(self.root,orient='vertical',troughcolor='green')
+        self.tv = ttk.Treeview(self.root, height=100)
+        self.tv.heading("#0", text='事件列表')
+        self.tv.column("#0", minwidth=1000, width=1000,stretch=NO)
+        self.tv.configure(yscrollcommand=self.ybar.set)
+        self.tv.configure(xscrollcommand=self.xbar.set)
+        ttk.Style().configure('Treeview.Heading', font=('楷体', 15))
+        #左部  x y滚动条
+        self.ybar.config(width=18, command=self.tv.yview)
+        self.xbar.config(width=25,command=self.tv.xview)
+        self.tv.place(relx=0.025, rely=0.05, relwidth=0.31, relheight=0.90)
+        self.ybar.pack(side=LEFT,fill=Y)
         self.root.bind('<ButtonRelease-1>',lambda event:self.treeviewclick(event))
         self.tv.bind('<ButtonRelease-1>',lambda event:self.click_event(event,self.tv))
-        #右边的文本
+        #右边
         self.mt = Text(self.root, width=10, height=48)
-        # self.mt.place(x=500,y=35,relwidth=0.9,relheight=0.9)
-        self.mt.place(x=200,y=35,relwidth=0.9,relheight=0.9)
+        self.mt.place(relx=0.35, rely=0.05, relwidth=0.628, relheight=0.90)
         self.mt.configure(font=('Courier', 9))
         self.root.mainloop()
+
     def on_closing(self):
         if messagebox.askokcancel("Quit","Do you want to quit?"):
             self.root.destroy()
@@ -227,14 +218,13 @@ class proxy_frame(object):
         insert_list = self.init_show()
         global global_data_list
         if len(insert_list)>0:
-            # print(json.dumps(insert_list, sort_keys=True, indent=2))
             for dic in insert_list:
                 key_list = list(dic.keys())
                 for k in key_list:
-                    # self.lb.insert(1,k)
                     self.tv.insert('',0,text=k)
+        self.root.after(800,self.write_kv_to_table,)
+
     #定时刷新
-        self.root.after(1000,self.write_kv_to_table)
     #选择未展示的插入列表
     def init_show(self):
         data_insert = []
@@ -248,12 +238,12 @@ class proxy_frame(object):
     def clean_table(self):
         global global_data_list
         global_data_list = []
+        print(self.tv.selection())
         if self.mt.get(1.0,END) != '':
             self.mt.delete(1.0,END)
         if self.tv.selection() != ():
             for item in self.tv.get_children():
                 self.tv.delete(item)
-
         else:
             self.mt.insert(1.0,'======无需清空======')
     #点击 复制
@@ -277,6 +267,12 @@ class proxy_frame(object):
         if self.mt.get(1.0,END) != '':
             self.mt.delete(1.0,END)
         self.mt.insert(1.0,json.dumps(old_json, sort_keys=True, indent=2,ensure_ascii=False))
+    def max_data_len(self):
+        len = 0
+        for i in table_data_list:
+            if len(i)>len:
+                len=len(i)
+        return len
 
 # #结束线程
 # def tid_drop_thread(tid, exctype):
@@ -315,11 +311,15 @@ def start_server(host,port=8889, IPv6=False, timeout=60,handler=ConnectionHandle
 def get_current_time():
     current_time = time.strftime('%H:%M:%S',time.localtime(time.time()))
     return current_time
-
+#获取本地ip
+def get_local_ip():
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    return ip
 if __name__ == '__main__':
     # sw = sign_in_window()
     # ip = sw.get_ip_passwd()[0]
     # passwd = sw.get_ip_passwd()[1]
     _thread.start_new_thread(proxy_frame, ())
-    Thread(target=start_server(host='192.168.1.3')).start()
+    Thread(target=start_server(host=get_local_ip())).start()
 
