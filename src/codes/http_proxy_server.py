@@ -1,5 +1,4 @@
 #coding:utf-8
-from threading import Timer, Thread
 from tkinter import messagebox, ttk
 import select
 from codes.decrypt import read_and_decode
@@ -316,10 +315,11 @@ def get_local_ip():
     hostname = socket.gethostname()
     ip = socket.gethostbyname(hostname)
     return ip
-if __name__ == '__main__':
-    # sw = sign_in_window()
+
     # ip = sw.get_ip_passwd()[0]
     # passwd = sw.get_ip_passwd()[1]
-    _thread.start_new_thread(proxy_frame, ())
-    Thread(target=start_server(host=get_local_ip())).start()
+    # print(ip)
+    # print(passwd)
+    #     # _thread.start_new_thread(proxy_frame, ())
+    #     # Thread(target=start_server(host=get_local_ip())).start()
 

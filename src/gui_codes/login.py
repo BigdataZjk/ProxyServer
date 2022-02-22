@@ -1,10 +1,13 @@
 #coding:utf-8
+import _thread
 import tkinter as tk
 import tkinter.messagebox
+from threading import Thread
 from tkinter import font
+from codes.http_proxy_server import proxy_frame, start_server, get_local_ip
 from gui_codes import tips_control
 
-global_ip = ''
+global_account = ''
 global_passwd = ''
 class sign_in_window(object):
     def __init__(self):
@@ -17,7 +20,7 @@ class sign_in_window(object):
         screen_inti_str = r'340x180' + r'+' + screen_width_x + r'+' + screen_height_y
         self.root.geometry(screen_inti_str)
     
-        lab_1 = tk.Label(self.root,width=7,text='本地IPV4:',compound='center')
+        lab_1 = tk.Label(self.root,width=7,text='授权账户:',compound='center')
         lab_1.place(x=30,y=40)
     
         lab_2 = tk.Label(self.root,width=7,text='使用密码:',compound='center')
@@ -53,18 +56,24 @@ class sign_in_window(object):
     def leave(self,event):
         self.toolTip.hidetip()
     def jurge(self):
-        global global_ip,global_passwd
-        ip = self.entry1.get()
+        global global_account,global_passwd
+        account = self.entry1.get()
         passwd = self.entry2.get()
-        if ip.startswith(r'10.') and passwd =='zjk':
-            global_ip = ip
+        if account in ['000'] and passwd =='000':
+            global_account = account
             global_passwd = passwd
             tk.messagebox.showinfo('^_^','欢迎使用本工具')
             #密码正确 进入工具界面
+
             self.root.destroy()
-        elif passwd !='zjk':
+        elif not account in ('000'):
+            tk.messagebox.showerror('*_*','无此账号,请重新输入')
+        elif passwd !='000':
             tk.messagebox.showerror('*_*','密码错误,请重新输入')
-        elif not ip.startswith(r'10.'):
-            tk.messagebox.showerror('*_*','IP错误,请重新输入')
     def get_ip_passwd(self):
-        return [global_ip,global_passwd]
+        return [global_account,global_passwd]
+if __name__ == '__main__':
+    sign_in_window()
+    if global_account in ['000'] and global_passwd =='000':
+        _thread.start_new_thread(proxy_frame, ())
+        Thread(target=start_server(host=get_local_ip())).start()
