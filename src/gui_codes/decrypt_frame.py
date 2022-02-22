@@ -1,5 +1,6 @@
 #coding:utf-8
 import json
+import tkinter
 from tkinter import *
 import time
 from codes.decrypt import aesDecrypt
@@ -19,11 +20,11 @@ class decrypt_frame(object):
         # self.init_tk_object['bg'] = 'DEEPSKYBLUE'
         # self.init_tk_object.attributes('-alpha',0.618)   #虚化
         #标签
-        self.init_data_label = Label(self.init_tk_object, text='待解密数据')
+        self.init_data_label = Label(self.init_tk_object, text='待解密数据',font=('楷体',10, 'bold'))
         self.init_data_label.grid(row=0, column=0)
-        self.result_data_label = Label(self.init_tk_object, text='解密结果')
+        self.result_data_label = Label(self.init_tk_object, text='解密结果',font=('楷体',10, 'bold'))
         self.result_data_label.grid(row=0, column=12)
-        self.log_label = Label(self.init_tk_object, text='日志')
+        self.log_label = Label(self.init_tk_object, text='日志',font=('楷体',10, 'bold'))
         self.log_label.grid(row=12, column=0)
         #文本框
         self.init_data_Text = Text(self.init_tk_object, width=67, height=35)  #原始数据录入框
@@ -33,7 +34,7 @@ class decrypt_frame(object):
         self.log_data_Text = Text(self.init_tk_object, width=66, height=9)  # 日志框
         self.log_data_Text.grid(row=13, column=0, columnspan=10)
         #按钮
-        self.aes_trans_to_str_button = Button(self.init_tk_object, text='解密', bg='lightblue', width=10,command=self.aes_trans_to_str)  # 调用内部方法  加()为直接调用
+        self.aes_trans_to_str_button = Button(self.init_tk_object, text='解密', bg='lightblue',font=('楷体',15, 'bold'), width=10,command=self.aes_trans_to_str)  # 调用内部方法  加()为直接调用
         self.aes_trans_to_str_button.grid(row=1, column=11)
     #返回代理frame 按钮事件
     def show_root_window(self):
@@ -80,7 +81,6 @@ class decrypt_frame(object):
         else:
             self.log_data_Text.delete(1.0,2.0)
             self.log_data_Text.insert(END, logmsg_in)
-
 # init_window = tkinter.Tk()
 # decrypt_frame_ = decrypt_frame(init_window)
 # init_window.mainloop()

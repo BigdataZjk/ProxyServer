@@ -160,14 +160,19 @@ class proxy_frame(object):
         self.root.geometry(screen_inti_str)
         self.root.title('银河代理')
         #代理和解码 工具切换按钮
-        self.change_btn = tk.Button(self.root, text='切换解密面板...',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=17, command=self.open_other_frame)
-        self.change_btn.place(x=830, y=0)
+        self.change_btn = tk.Button(self.root, text='切换解密面板...',compound='center',fg='red',cursor='hand2', bg='white',font=('楷体',10, 'bold'), width=17, command=self.open_other_frame)
+        self.change_btn.place(x=830, y=1)
         # #刷新按钮
-        self.restart_btn = tk.Button(self.root, text='开启自动刷新',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=15 ,command= self.write_kv_to_table)
-        self.restart_btn.place(x=535, y=0)
+        self.restart_btn = tk.Button(self.root, text='开始抓取',compound='center',fg='blue',cursor='hand2', bg='white',font=('楷体',10, 'bold'), width=15 ,command= self.write_kv_to_table)
+        self.restart_btn.place(x=635, y=1)
+        #本地ip
+        self.mt_ = Text(self.root, width=25, height=1)
+        self.mt_.insert(1.0,'本地IP: '+get_local_ip())
+        self.mt_.config(state='disabled',font=('楷体',10, 'bold'))
+        self.mt_.place(x=355, y=5)
         #清屏按钮
-        self.restart_btn = tk.Button(self.root, text='清屏',compound='center',fg='red',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=10 ,command= self.clean_table)
-        self.restart_btn.place(x=40, y=0)
+        self.restart_btn = tk.Button(self.root, text='清屏',compound='center',fg='red',cursor='hand2', bg='white',font=('楷体',10, 'bold'), width=10 ,command= self.clean_table)
+        self.restart_btn.place(x=40, y=1)
         #左边
         self.xbar = Scrollbar(self.root,orient='horizontal',troughcolor='blue')
         self.xbar.pack(side=BOTTOM, fill=X)
@@ -207,7 +212,7 @@ class proxy_frame(object):
         self.hide_root_window()
         init_window = tk.Toplevel()
         decrypt_frame_ = decrypt_frame(init_window)
-        btn = tk.Button(init_window, text='返回代理......',fg='red',compound='center',cursor='hand2', bg='lightblue',font=('',10, 'bold'), width=20,command=lambda: self.close_other_frame(init_window))#font=('楷体', 10, 'bold', 'italic')
+        btn = tk.Button(init_window, text='返回代理......',fg='red',compound='center',cursor='hand2', bg='lightblue',font=('楷体',10, 'bold'), width=20,command=lambda: self.close_other_frame(init_window))#font=('楷体', 10, 'bold', 'italic')
         btn.grid(row=0, column=20)
         #退出销毁父级
         init_window.protocol("WM_DELETE_WINDOW", self.on_closing)
