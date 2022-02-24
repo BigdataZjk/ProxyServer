@@ -8,7 +8,6 @@ BLOCK_SIZE = 16  # Bytes
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(s) % BLOCK_SIZE)
 unpad = lambda s: s[:-ord(s[len(s) - 1:])]
 
-DECTYPT_PASSWD = 'neteasemobiledat'
 #加密
 def aesEncrypt(key, data):
     key = key.encode('utf8')
